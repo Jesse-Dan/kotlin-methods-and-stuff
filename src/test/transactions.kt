@@ -1,26 +1,72 @@
-fun main() {
+   
+   fun main() {
+      val accounts = listOf(
+        Account("Jesse", 90688, 200000, mutableListOf()),
+        Account("Samuel", 80877, 10000, mutableListOf())
+    )
 
-   val act1 = Account("Jesse", 90688, 200000, mutableListOf<TransactionSend>())
-   val act2 = Account("Samuel", 80877, 10000, mutableListOf<TransactionSend>())
+    val transactions = generateTransactions(accounts)
+    transactions.forEachIndexed { ex, transaction -> 
 
-    Transaction(act1, act2, 30000)
-}
+      Transaction(transaction.fromWho, transaction.toWho, transaction.amount,ex)
 
+      }
 
-
-  class Transaction(val fromWho: Account, val toWho: Account, val amount: Int) {
-
-   init {
-       send()
    }
 
+   
+
+
+fun generateTransactions(accounts: List<Account>): List<Transaction> {
+    val transactions = mutableListOf<Transaction>()
+
+    for (account1 in accounts) {
+        for (account2 in accounts) {
+            if (account1 != account2) {
+                transactions.add(Transaction(account1, account2, 30000,0))
+            }
+        }
+    }
+
+    return transactions
+}
+
+  class Transaction constructor(val fromWho: Account, val toWho: Account, val amount: Int,val ex:Int) {
+   val transaction: TransactionSend;
+
+   init {
+      transaction =  TransactionSend(fromWho,toWho,amount);
+       send()
+   }
+   fun viewTransactionHistory() {
+      val fromWhoTransactions = transaction.fromWho.transactions
+      val toWhoTransactions = transaction.toWho.transactions
+  
+      logger("OPENING TRANSACTION HISTORY")
+      logger("SENDER HISTORY")
+  
+      for (singleTransaction in fromWhoTransactions) {
+          println("Index: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
+      }
+  
+      logger("RECEIVER HISTORY")
+      for (singleTransaction in toWhoTransactions) {
+          println("Index: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
+      }
+      
+      logger("CLOSING TRANSACTION HISTORY")
+      logger("DONE")
+  }
+  
+
     fun send() {
-       if (!fromWho.hasSufficientBalance(amount)) {
+       if (fromWho.hasSufficientBalance(amount)) {
          transferFailed()
            return
        }else{
          transfer()
          logTransaction()
+         viewTransactionHistory()
          return
        }
       
@@ -33,7 +79,6 @@ fun main() {
    }
 
    fun transfer(){
-      var transaction = TransactionSend(fromWho,toWho,amount)
    
       transaction.fromWho.accountBalance = transaction.fromWho.accountBalance?.minus(amount)
       transaction.toWho.accountBalance = transaction.toWho.accountBalance?.plus(amount)
@@ -47,21 +92,36 @@ fun main() {
 
    }
 
+   fun saveTransaction():Boolean{
+      try {
+         fromWho.transactions.add(transaction);
+         toWho.transactions.add(transaction);
+         return true
+      }
+      catch(e:Exception) {
+         logger("${e.message}")
+         return false
+      }
+     
+
+   }
    
 
     fun logTransaction(){
-      var transaction = TransactionSend(fromWho,toWho,amount);
-      fromWho.transactions.add(transaction);
-      toWho.transactions.add(transaction);
       logger("ADDING TO HISTORY")
+      if(saveTransaction()){
       println("Transaction added to history.\nDetails: \nTransactions Recieved From ${transaction.fromWho.accountName} - ${transaction.toWho.accountName}\n")
       println("Transaction added to history.\nDetails: \nTransactions Sent: Sender ${transaction.fromWho.accountName} - Reciever: ${transaction.toWho.accountName}\n")
       println("\nAmount Transfered: ${transaction.amount}\n")
       logger("ADDED TO HISTORY")
+   }else{
+      logger("FAILED TO ADD HISTORY")
+      }
     }
 
 
 }
+
 data class Handler (
    val message:String="Not Handled [Message Not Passed to Handler]",
    val sucessfull:Boolean=true,
