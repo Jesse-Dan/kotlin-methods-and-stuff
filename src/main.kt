@@ -1,7 +1,7 @@
 
-//  val fruits = arrayOf<String>("Apple", "Mango", "Banana", "Orange")
+  val fruits = arrayOf<String>("Apple", "Mango", "Banana", "Orange")
 
-/*  fun main(){
+  fun main(){
  adder(fruits);
  arrayMethods(fruits)
  checkIfElementOfArrayExist(fruits)
@@ -46,8 +46,8 @@
      }
 
  }
-*/
-/*Distinct Values from Array
+
+Distinct Values from Array
 Kotlin allows to store duplicate values in an array, but same 
 time you can get a set of distinct values stored in the array using distinct() member function.
  
@@ -167,16 +167,31 @@ fun main(args: Array<String>) {
     
     return result
  }
-*/
+
  fun main(args: Array<String>) {
    
-    val result = calculate(4, 5, ::sun) 
+    val result = calculate(4, 5, ::subtraction) 
     println( result )
     
  }
  fun sum(a: Int, b: Int) = a + b 
- 
+ fun subtraction(a: Int, b: Int) = a - b 
+
  fun calculate(a: Int, b: Int, operation:(Int, Int) -> Int): Int {
      return operation(a, b)                                       
  }
 
+
+
+ fun main(args: Array<String>) {
+ println()
+ }
+
+ fun calculator(){
+
+ }
+
+
+fun main(args: Array<String>) {
+   
+}
