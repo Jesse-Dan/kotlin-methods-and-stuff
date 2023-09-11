@@ -1,37 +1,47 @@
    
    fun main() {
-      val accounts = listOf(
-        Account("Jesse", 90688, 200000, mutableListOf()),
-        Account("Samuel", 80877, 10000, mutableListOf())
-    )
-
-    val transactions = generateTransactions(accounts)
+      val accounts = generateAccounts(25)
+      val transactions = generateTransactions(accounts)
+  
+    
     transactions.forEachIndexed { ex, transaction -> 
 
-      Transaction(transaction.fromWho, transaction.toWho, transaction.amount,ex)
+      Transaction(transaction.fromWho, transaction.toWho, transaction.amount,transaction.ex)
 
       }
 
    }
+   fun generateAccounts(count: Int): List<Account> {
+      val accounts = mutableListOf<Account>()
+      for (i in 1..count) {
+          accounts.add(Account("User$i", 10000 + i, 100000 + i * 500, mutableListOf()))
+      }
+      return accounts
+  }
 
-   
+  fun generateUniqueID(prefix: String, length: Int): String {
+   val characters = ('A'..'Z') + ('0'..'9')
+   var randomID = (1..length)
+       .map { characters.random() }
+       .joinToString("")
 
-
-fun generateTransactions(accounts: List<Account>): List<Transaction> {
-    val transactions = mutableListOf<Transaction>()
-
-    for (account1 in accounts) {
-        for (account2 in accounts) {
-            if (account1 != account2) {
-                transactions.add(Transaction(account1, account2, 30000,0))
-            }
-        }
-    }
-
-    return transactions
+   return "${prefix}_${randomID}"
 }
 
-  class Transaction constructor(val fromWho: Account, val toWho: Account, val amount: Int,val ex:Int) {
+
+
+  fun generateTransactions(accounts: List<Account>): List<Transaction> {
+   val transactions = mutableListOf<Transaction>()
+   for (i in 0 until accounts.size - 1) {
+       for (j in i + 1 until accounts.size) {
+           transactions.add(Transaction(accounts[i], accounts[j], (i + j) * 1000,"${generateUniqueID("FINNBANK",8)}"))
+       }
+   }
+   return transactions
+}
+
+
+  class Transaction constructor(val fromWho: Account, val toWho: Account, val amount: Int,val ex:String) {
    val transaction: TransactionSend;
 
    init {
@@ -46,13 +56,16 @@ fun generateTransactions(accounts: List<Account>): List<Transaction> {
       logger("SENDER HISTORY")
   
       for (singleTransaction in fromWhoTransactions) {
-          println("Index: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
-      }
+          println("TRANSACTION-ID: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
+      
+         }
   
       logger("RECEIVER HISTORY")
       for (singleTransaction in toWhoTransactions) {
-          println("Index: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
-      }
+          println("InTRANSACTION-IDdex: [${ex}]- Sender: ${singleTransaction.fromWho.accountName} \nReceiver: ${singleTransaction.toWho.accountName}\nAmount: ${singleTransaction.amount}")
+          logger("===")
+
+         }
       
       logger("CLOSING TRANSACTION HISTORY")
       logger("DONE")
@@ -60,7 +73,7 @@ fun generateTransactions(accounts: List<Account>): List<Transaction> {
   
 
     fun send() {
-       if (fromWho.hasSufficientBalance(amount)) {
+       if (!fromWho.hasSufficientBalance(amount)) {
          transferFailed()
            return
        }else{
